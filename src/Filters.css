@@ -1,0 +1,14 @@
+.filters {
+  display: flex;
+  margin-bottom: 15px;
+}
+.flex-2 {
+  flex-grow: 2;
+}
+.flex-1 {
+  flex-grow: 1;
+}
+
+input, select {
+  border: 1px solid;
+}

@@ -3,7 +3,9 @@
   margin: 20px auto;
   width: 700px;
 }
-
+table {
+  margin-left: 10px;
+}
 table, th, td {
   border: 1px solid black;
   border-collapse: collapse;
