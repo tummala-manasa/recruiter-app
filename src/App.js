@@ -3,12 +3,12 @@ import './App.css';
 
 let data = [
   {
-    Name: 'test', Email: 'test@gmail.com', Age: '1-1-1990',
+    Name: 'test1', Email: 'test@gmail.com', Age: '1-1-1990',
     Experience: 1, Position: 'Engineer', Date: '1-1-2019', Status: 'approved'
   },
   {
     Name: 'test1', Email: 'test1@gmail.com', Age: '1-3-1990',
-    Experience: 4, Position: 'Manager', Date: '1-3-2019', Status: 'approved'
+    Experience: 4, Position: 'Manager', Date: '1-3-2019', Status: 'waiting'
   },
   {
     Name: 'test2', Email: 'test2@gmail.com', Age: '1-2-1990',
@@ -20,27 +20,53 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      updatedList: [],
-      sort: {
-        experience: null,
-        position: null,
-        date: null
-      }
+      updatedList: []
     }
   }
   componentDidMount() {
-    this.setState({updatedList: data});
+    this.filterByFields();
   }
 
-  handleSort = (sortBy, order) => {
-    let sortedArray = [];
-    if (order === 'a') {
-      sortedArray = this.state.updatedList.sort((data1,data2) => (data1[sortBy] > data2[sortBy]) ? 1 : -1 );
-    } else {
-      sortedArray = this.state.updatedList.sort((data1,data2) => (data1[sortBy] < data2[sortBy]) ? 1 : -1 );
-    }
-    this.setState({updatedList: sortedArray});
+  sortByOrder = () => {
+    const queryParams = new URLSearchParams(this.props.location.search);
+    const sortBy = queryParams.get('sortBy');
+    const order = queryParams.get('order');
+    this.setState(prevState => {
+      const sortedArray = (order === 'a') ?
+        [...prevState.updatedList].sort((data1,data2) => (data1[sortBy] > data2[sortBy]) ? 1 : -1 ) :
+        [...prevState.updatedList].sort((data1,data2) => (data1[sortBy] < data2[sortBy]) ? 1 : -1 );
+      return {updatedList: sortedArray};
+    })
   }
+
+  filterByFields = () => {
+    const queryParams = new URLSearchParams(this.props.location.search);
+
+    const filteredData = [...data].filter(curData => {
+      return [...queryParams.entries()].reduce((acc, [key, value]) => {
+        return acc && (key === 'sortBy' || key === 'order' || curData[key].includes(value));
+      }, true);
+    });
+
+    this.setState({updatedList: filteredData});
+    this.sortByOrder();
+  }
+
+  handleSort = async (sortBy, order) => {
+    const queryParams = new URLSearchParams(this.props.location.search);
+    queryParams.set('sortBy', sortBy);
+    queryParams.set('order', order);
+    await this.props.history.push(`/?${queryParams.toString()}`);
+    this.sortByOrder();
+  }
+
+  handleOnChange = async (e) => {
+    const queryParams = new URLSearchParams(this.props.location.search);
+    queryParams.set(e.target.name, e.target.value);
+    await this.props.history.push(`/?${queryParams.toString()}`);
+    this.filterByFields();
+  }
+
   render() {
     let displayList = this.state.updatedList.map(data => {
       return (
@@ -70,16 +96,16 @@ class App extends Component {
       <div className="App">
         <div style={{'display': 'flex', 'marginBottom': '15px',}}>
           <span style={{'flexGrow': '1'}}>Filter By:</span>
-          <span style={{'flexGrow': '2'}}>Name:<br/><input onChange={this.handleOnChange} type="text"/></span>
+          <span style={{'flexGrow': '2'}}>Name:<br/><input name="Name" onChange={this.handleOnChange} type="text" /></span>
           <span style={{'flexGrow': '2'}}>Status:<br/>
-            <select name="status">
-              <option value="all">all</option>
+            <select name="Status" onChange={this.handleOnChange}>
+              <option></option>
               <option value="approved">approved</option>
               <option value="waiting">waiting</option>
               <option value="reject">reject</option>
             </select>
           </span>
-          <span style={{'flexGrow': '2'}}>Position:<br/><input type="text"/></span>
+          <span style={{'flexGrow': '2'}}>Position:<br/><input name="Position" onChange={this.handleOnChange} type="text"/></span>
         </div>
         <table>
           <tbody>
