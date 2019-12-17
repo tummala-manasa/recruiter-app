@@ -14,3 +14,14 @@ th, td {
 th {
   text-align: left;
 }
+.arrow {
+  width: 15px;
+  vertical-align: middle;
+  margin-right: 5px;
+  cursor: pointer;
+}
+.up {
+  transform: rotate(180deg);
+  margin-left: 5px;
+  margin-right: 0;
+}
